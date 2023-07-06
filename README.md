@@ -18,5 +18,6 @@ SQLite is an embedded, server-less relational database management system. It is 
 <br> <br>
 Here is the preview of the hackplanner<br><br><br>
 
-![image](https://github.com/miinus-vee/HackPlanner/assets/91024452/2c1bae38-73d5-424f-a2a9-741cb6592646)
+![image](https://github.com/miinus-vee/HackPlanner/assets/91024452/198dfc72-9fec-4f57-a27b-0dc030ec4e04)
+
 
