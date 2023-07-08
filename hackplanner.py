@@ -3,7 +3,8 @@ from tkinter import messagebox
 from tkcalendar import DateEntry
 import datetime
 import sqlite3
-import winsound
+
+
 
 # Create the tasks table in the database
 def create_table():
@@ -44,7 +45,7 @@ def set_reminder():
     if len(selected_task) > 0:
         task = task_list.get(selected_task[0])
         task_name, task_date = task.split(" - ")
-        date_obj = datetime.datetime.strptime(task_date, "%Y-%m-%d")
+        date_obj = datetime.datetime.strptime(task_date, "%Y-%m-%d").date()
         today = datetime.date.today()
         if date_obj >= today:
             days_left = (date_obj - today).days
@@ -60,9 +61,14 @@ def set_alarm():
         task = task_list.get(selected_task[0])
         task_name, task_date = task.split(" - ")
         alarm_time = alarm_time_entry.get()
+        am_pm = am_pm_var.get()  # Retrieve the selected AM/PM value
         if alarm_time.strip() != '':
             try:
                 alarm_hours, alarm_minutes = alarm_time.split(':')
+                if am_pm == 'PM' and int(alarm_hours) < 12:
+                    alarm_hours = str(int(alarm_hours) + 12)  # Convert to 24-hour format for PM
+                elif am_pm == 'AM' and int(alarm_hours) == 12:
+                    alarm_hours = '0'  # Convert 12 AM to 00 AM
                 current_time = datetime.datetime.now().time()
                 alarm_datetime = datetime.datetime.combine(datetime.date.today(), current_time)
                 alarm_datetime += datetime.timedelta(hours=int(alarm_hours), minutes=int(alarm_minutes))
@@ -71,8 +77,9 @@ def set_alarm():
                     messagebox.showwarning("Warning", "Please select a future time for the alarm.")
                 else:
                     root.after(int(alarm_delay), play_alarm)
-                    messagebox.showinfo("Alarm Set", f"Alarm set for Task '{task_name}' at {alarm_time}")
+                    messagebox.showinfo("Alarm Set", f"Alarm set for Task '{task_name}' at {alarm_time} {am_pm}")
                     alarm_time_entry.delete(0, tk.END)
+                    am_pm_var.set('AM')  # Reset the AM/PM selection
             except ValueError:
                 messagebox.showwarning("Warning", "Please enter the alarm time in HH:MM format.")
         else:
@@ -81,7 +88,12 @@ def set_alarm():
         messagebox.showwarning("Warning", "Please select a task from the list.")
 
 def play_alarm():
-    winsound.PlaySound("SystemAsterisk", winsound.SND_ALIAS)
+    pygame.mixer.init()
+    alarm_sound_file = "alarm.wav"  # Replace with the actual path to your audio file
+    pygame.mixer.music.load(alarm_sound_file)
+    pygame.mixer.music.play()
+
+
 
 # Create the tasks table in the database
 create_table()
@@ -141,11 +153,22 @@ alarm_time_label.grid(row=0, column=0, padx=5, pady=5)
 alarm_time_entry = tk.Entry(alarm_frame, width=10, font=("Arial", 16))
 alarm_time_entry.grid(row=0, column=1, padx=5, pady=5)
 
-alarm_button = tk.Button(main_frame, text="Set Alarm", command=set_alarm, bg="#F48FB1", fg="#FFF", font=("Arial", 16))
+# Add the AM/PM selection dropdown
+am_pm_var = tk.StringVar()
+am_pm_var.set('AM')  # Set default selection to AM
+
+am_pm_label = tk.Label(alarm_frame, text="AM/PM:", bg="#FFF", font=("Arial", 16))
+am_pm_label.grid(row=0, column=2, padx=5, pady=5)
+
+am_pm_dropdown = tk.OptionMenu(alarm_frame, am_pm_var, 'AM', 'PM')
+am_pm_dropdown.grid(row=0, column=3, padx=5, pady=5)
+
+alarm_button = tk.Button(main_frame, text="Set Alarm", command=set_alarm, bg="#F48FB1", fg="#bFF", font=("Arial", 16))
 alarm_button.pack(pady=5)
 
 footer_label = tk.Label(root, text="© 2023 HackPlanner. All rights reserved.", fg="#FFF", bg="#F48FB1", pady=10)
 footer_label.pack(fill=tk.X)
 
 root.mainloop()
+
 
