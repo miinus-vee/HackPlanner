@@ -1,11 +1,14 @@
 # HackPlanner
 ## INSTRUCTIONS:
-Install Tkcalendar and sqlite3 on your systemshell using the following command:<br>
+Install Tkcalendar, pygame and sqlite3 on your systemshell using the following command:<br>
 ```
 pip install tkcalendar
 ```
 ```
 pip install sqlite3
+```
+```
+pip install pygame
 ```
 ### tkinter: 
 Tkinter is the inbuilt python module that is used to create GUI applications. It is one of the most commonly used modules for creating GUI applications in Python as it is simple and easy to work with.
@@ -19,5 +22,8 @@ SQLite is an embedded, server-less relational database management system. It is 
 Here is the preview of the hackplanner<br><br><br>
 
 ![image](https://github.com/miinus-vee/HackPlanner/assets/91024452/9c72b467-1595-4f99-842b-c1f0a5443fcf)
+
+
+<br> <br><br> <br><br> <br><br> <br>
 
 
