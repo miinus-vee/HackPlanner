@@ -3,7 +3,8 @@ from tkinter import messagebox
 from tkcalendar import DateEntry
 import datetime
 import sqlite3
-
+import pygame
+import time
 
 
 # Create the tasks table in the database
@@ -55,45 +56,30 @@ def set_reminder():
     else:
         messagebox.showwarning("Warning", "Please select a task from the list!")
 
+
 def set_alarm():
-    selected_task = task_list.curselection()
-    if len(selected_task) > 0:
-        task = task_list.get(selected_task[0])
-        task_name, task_date = task.split(" - ")
-        alarm_time = alarm_time_entry.get()
-        am_pm = am_pm_var.get()  # Retrieve the selected AM/PM value
-        if alarm_time.strip() != '':
-            try:
-                alarm_hours, alarm_minutes = alarm_time.split(':')
-                if am_pm == 'PM' and int(alarm_hours) < 12:
-                    alarm_hours = str(int(alarm_hours) + 12)  # Convert to 24-hour format for PM
-                elif am_pm == 'AM' and int(alarm_hours) == 12:
-                    alarm_hours = '0'  # Convert 12 AM to 00 AM
-                current_time = datetime.datetime.now().time()
-                alarm_datetime = datetime.datetime.combine(datetime.date.today(), current_time)
-                alarm_datetime += datetime.timedelta(hours=int(alarm_hours), minutes=int(alarm_minutes))
-                alarm_delay = (alarm_datetime - datetime.datetime.now()).total_seconds() * 1000
-                if alarm_delay < 0:
-                    messagebox.showwarning("Warning", "Please select a future time for the alarm.")
-                else:
-                    root.after(int(alarm_delay), play_alarm)
-                    messagebox.showinfo("Alarm Set", f"Alarm set for Task '{task_name}' at {alarm_time} {am_pm}")
-                    alarm_time_entry.delete(0, tk.END)
-                    am_pm_var.set('AM')  # Reset the AM/PM selection
-            except ValueError:
-                messagebox.showwarning("Warning", "Please enter the alarm time in HH:MM format.")
-        else:
-            messagebox.showwarning("Warning", "Please enter the alarm time.")
+    alarm_time = alarm_time_entry.get()
+    if alarm_time.strip() != '':
+        try:
+            current_time = datetime.datetime.now().strftime("%H:%M")
+            alarm_datetime = datetime.datetime.strptime(alarm_time, "%H:%M")
+            current_datetime = datetime.datetime.strptime(current_time, "%H:%M")
+            time_diff = (alarm_datetime - current_datetime).total_seconds()
+
+            if time_diff > 0:
+                messagebox.showwarning("Warning", "Please select a future time for the alarm.")
+            else:
+                pygame.mixer.init()
+                alarm_sound_file = "alarm.wav"  # Replace with the actual path to your audio file
+                pygame.mixer.music.load(alarm_sound_file)
+                pygame.mixer.music.play()
+                messagebox.showinfo("Alarm", "Time's up!")
+
+        except ValueError:
+            messagebox.showwarning("Warning", "Please enter the alarm time in HH:MM format.")
+
     else:
-        messagebox.showwarning("Warning", "Please select a task from the list.")
-
-def play_alarm():
-    pygame.mixer.init()
-    alarm_sound_file = "alarm.wav"  # Replace with the actual path to your audio file
-    pygame.mixer.music.load(alarm_sound_file)
-    pygame.mixer.music.play()
-
-
+        messagebox.showwarning("Warning", "Please enter the alarm time.")
 
 # Create the tasks table in the database
 create_table()
